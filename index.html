@@ -682,7 +682,9 @@
       <button class="modal-close" onclick="closeModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <img id="modal-img" src="" alt="" loading="lazy">
+      <img id="modal-img" src="" alt="" style="display:none">
+      <div id="modal-loading" style="display:none;padding:40px;color:#a0aec0;font-size:0.9rem">⏳ 加载动作示范图中...</div>
+      <div id="modal-error" style="display:none;padding:40px;color:#e53e3e;font-size:0.9rem">加载失败，请检查网络后重试</div>
     </div>
     <div class="modal-tips" id="modal-tips"></div>
   </div>
@@ -844,30 +846,30 @@ const SUPPLEMENTS = [
 
 // Exercise name → image file mapping
 const EX_IMAGES = {
-  "杠铃深蹲": "exercises/01_杠铃深蹲.png",
-  "杠铃卧推": "exercises/02_杠铃卧推.png",
-  "哑铃卧推": "exercises/16_哑铃卧推.png",
-  "上斜哑铃飞鸟": "exercises/09_上斜哑铃飞鸟.png",
-  "杠铃俯身划船": "exercises/04_杠铃俯身划船.png",
-  "坐姿绳索划船": "exercises/15_坐姿绳索划船.png",
-  "引体向上（或辅助引体）": "exercises/07_引体向上.png",
-  "站姿杠铃推举（OHP）": "exercises/05_杠铃推举OHP.png",
-  "哑铃侧平举": "exercises/08_哑铃侧平举.png",
-  "绳索面拉": "exercises/10_绳索面拉.png",
-  "杠铃弯举": "exercises/11_杠铃弯举.png",
-  "锤式弯举": "exercises/11_杠铃弯举.png",
-  "绳索三头下压": "exercises/12_绳索三头下压.png",
-  "罗马尼亚硬拉（RDL）": "exercises/03_罗马尼亚硬拉.png",
-  "哑铃罗马尼亚硬拉": "exercises/03_罗马尼亚硬拉.png",
-  "前蹲（或高杠深蹲）": "exercises/17_前蹲.png",
-  "保加利亚分腿蹲": "exercises/06_保加利亚分腿蹲.png",
-  "腿举": "exercises/14_腿举.png",
-  "坐姿腿屈伸": "exercises/19_坐姿腿屈伸.png",
-  "坐姿腿弯举": "exercises/20_俯卧腿弯举.png",
-  "俯卧腿弯举": "exercises/20_俯卧腿弯举.png",
-  "站姿小腿提踵": "exercises/18_小腿提踵.png",
-  "坐姿小腿提踵": "exercises/18_小腿提踵.png",
-  "平板支撑": "exercises/13_平板支撑.png"
+  "杠铃深蹲": "exercises/01_杠铃深蹲.jpg",
+  "杠铃卧推": "exercises/02_杠铃卧推.jpg",
+  "哑铃卧推": "exercises/16_哑铃卧推.jpg",
+  "上斜哑铃飞鸟": "exercises/09_上斜哑铃飞鸟.jpg",
+  "杠铃俯身划船": "exercises/04_杠铃俯身划船.jpg",
+  "坐姿绳索划船": "exercises/15_坐姿绳索划船.jpg",
+  "引体向上（或辅助引体）": "exercises/07_引体向上.jpg",
+  "站姿杠铃推举（OHP）": "exercises/05_杠铃推举OHP.jpg",
+  "哑铃侧平举": "exercises/08_哑铃侧平举.jpg",
+  "绳索面拉": "exercises/10_绳索面拉.jpg",
+  "杠铃弯举": "exercises/11_杠铃弯举.jpg",
+  "锤式弯举": "exercises/11_杠铃弯举.jpg",
+  "绳索三头下压": "exercises/12_绳索三头下压.jpg",
+  "罗马尼亚硬拉（RDL）": "exercises/03_罗马尼亚硬拉.jpg",
+  "哑铃罗马尼亚硬拉": "exercises/03_罗马尼亚硬拉.jpg",
+  "前蹲（或高杠深蹲）": "exercises/17_前蹲.jpg",
+  "保加利亚分腿蹲": "exercises/06_保加利亚分腿蹲.jpg",
+  "腿举": "exercises/14_腿举.jpg",
+  "坐姿腿屈伸": "exercises/19_坐姿腿屈伸.jpg",
+  "坐姿腿弯举": "exercises/20_俯卧腿弯举.jpg",
+  "俯卧腿弯举": "exercises/20_俯卧腿弯举.jpg",
+  "站姿小腿提踵": "exercises/18_小腿提踵.jpg",
+  "坐姿小腿提踵": "exercises/18_小腿提踵.jpg",
+  "平板支撑": "exercises/13_平板支撑.jpg"
 };
 
 // Exercise name → key form tips
@@ -901,17 +903,44 @@ const EX_TIPS = {
 function openModal(exerciseName) {
   const imgSrc = EX_IMAGES[exerciseName];
   if (!imgSrc) return;
-  document.getElementById("modal-img").src = imgSrc;
+  const img = document.getElementById("modal-img");
+  const loading = document.getElementById("modal-loading");
+  const error = document.getElementById("modal-error");
+
+  // Reset states
+  img.style.display = "none";
+  img.src = "";
+  loading.style.display = "block";
+  error.style.display = "none";
+
   document.getElementById("modal-title").textContent = exerciseName;
   const tips = EX_TIPS[exerciseName] || "注意动作规范，感受目标肌肉发力";
   document.getElementById("modal-tips").innerHTML = `<strong>动作要领：</strong>${tips}`;
   document.getElementById("ex-modal").classList.add("show");
   document.body.style.overflow = "hidden";
+
+  // Trigger image load AFTER modal is visible
+  requestAnimationFrame(() => {
+    img.onload = function() {
+      loading.style.display = "none";
+      img.style.display = "";
+    };
+    img.onerror = function() {
+      loading.style.display = "none";
+      error.style.display = "block";
+    };
+    img.src = imgSrc;
+  });
 }
 
 function closeModal() {
   document.getElementById("ex-modal").classList.remove("show");
   document.body.style.overflow = "";
+  // Clean up to stop any in-flight image load
+  const img = document.getElementById("modal-img");
+  img.onload = null;
+  img.onerror = null;
+  img.src = "";
 }
 
 let currentDay = null;
