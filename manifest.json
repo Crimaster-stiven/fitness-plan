@@ -1,0 +1,17 @@
+{
+  "name": "增重计划 · 16周健身",
+  "short_name": "增重计划",
+  "description": "55kg→65kg · 私人训练与饮食计划",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#f0f4f8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='.7em' font-size='60' text-anchor='middle' x='50'>🏋️</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
