@@ -554,6 +554,95 @@
     border-radius: 3px;
     transition: width 0.5s ease;
   }
+
+  /* ===== EXERCISE IMAGE MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.show { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-box {
+    background: white;
+    border-radius: var(--radius);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.25s ease;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 8px;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+  }
+  .modal-title {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text);
+  }
+  .modal-close {
+    background: var(--gray-light);
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-body {
+    padding: 8px 20px;
+    text-align: center;
+  }
+  .modal-body img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .modal-tips {
+    padding: 12px 20px 20px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    text-align: center;
+    border-top: 1px solid #f7f8fa;
+  }
+
+  /* exercise image hint icon */
+  .ex-img-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    padding: 2px 8px;
+    background: var(--purple-light);
+    color: var(--purple-dark);
+    border-radius: 8px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    vertical-align: middle;
+    transition: all 0.15s;
+  }
+  .ex-img-btn:active { background: var(--purple); color: white; transform: scale(0.95); }
 </style>
 </head>
 <body>
@@ -584,6 +673,20 @@
 </div>
 
 <div class="container" id="content"></div>
+
+<!-- Exercise Image Modal -->
+<div class="modal-overlay" id="ex-modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title"></span>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <img id="modal-img" src="" alt="" loading="lazy">
+    </div>
+    <div class="modal-tips" id="modal-tips"></div>
+  </div>
+</div>
 
 <footer>
   55kg → 65kg · 16周增重计划 · 每日自动更新<br>
@@ -739,6 +842,78 @@ const SUPPLEMENTS = [
   {name:"增重粉（吃不够时补充）",pri:"opt",label:"视情况"}
 ];
 
+// Exercise name → image file mapping
+const EX_IMAGES = {
+  "杠铃深蹲": "exercises/01_杠铃深蹲.png",
+  "杠铃卧推": "exercises/02_杠铃卧推.png",
+  "哑铃卧推": "exercises/16_哑铃卧推.png",
+  "上斜哑铃飞鸟": "exercises/09_上斜哑铃飞鸟.png",
+  "杠铃俯身划船": "exercises/04_杠铃俯身划船.png",
+  "坐姿绳索划船": "exercises/15_坐姿绳索划船.png",
+  "引体向上（或辅助引体）": "exercises/07_引体向上.png",
+  "站姿杠铃推举（OHP）": "exercises/05_杠铃推举OHP.png",
+  "哑铃侧平举": "exercises/08_哑铃侧平举.png",
+  "绳索面拉": "exercises/10_绳索面拉.png",
+  "杠铃弯举": "exercises/11_杠铃弯举.png",
+  "锤式弯举": "exercises/11_杠铃弯举.png",
+  "绳索三头下压": "exercises/12_绳索三头下压.png",
+  "罗马尼亚硬拉（RDL）": "exercises/03_罗马尼亚硬拉.png",
+  "哑铃罗马尼亚硬拉": "exercises/03_罗马尼亚硬拉.png",
+  "前蹲（或高杠深蹲）": "exercises/17_前蹲.png",
+  "保加利亚分腿蹲": "exercises/06_保加利亚分腿蹲.png",
+  "腿举": "exercises/14_腿举.png",
+  "坐姿腿屈伸": "exercises/19_坐姿腿屈伸.png",
+  "坐姿腿弯举": "exercises/20_俯卧腿弯举.png",
+  "俯卧腿弯举": "exercises/20_俯卧腿弯举.png",
+  "站姿小腿提踵": "exercises/18_小腿提踵.png",
+  "坐姿小腿提踵": "exercises/18_小腿提踵.png",
+  "平板支撑": "exercises/13_平板支撑.png"
+};
+
+// Exercise name → key form tips
+const EX_TIPS = {
+  "杠铃深蹲": "核心收紧，腰背挺直，膝盖与脚尖同一方向，大腿蹲至平行地面",
+  "杠铃卧推": "肩胛骨收紧沉肩，杠铃下降至下胸位置，推起时锁定但不超伸",
+  "哑铃卧推": "手腕中立位，最低点哑铃在胸两侧，推至顶部哑铃靠近但不碰撞",
+  "上斜哑铃飞鸟": "手臂微屈保持角度不变，感受胸肌拉伸与收缩，勿用肩膀代偿",
+  "杠铃俯身划船": "身体前倾45°，腰背挺直，杠铃拉向腹部，肘关节向后上方驱动",
+  "坐姿绳索划船": "背部发力带动手臂，肩胛骨充分收缩，拉向腹部而非胸部",
+  "引体向上（或辅助引体）": "正握比肩略宽，核心收紧不摆动，下巴过杠，顶峰收缩背部",
+  "站姿杠铃推举（OHP）": "核心收紧避免后仰，杠铃垂直上推至头顶锁定，头部微前移让杠",
+  "哑铃侧平举": "肘部微屈略高于手腕，抬至肩高即可，避免耸肩借力，控制离心",
+  "绳索面拉": "拉向面部方向，肘向外展，感受后三角肌和菱形肌收缩",
+  "杠铃弯举": "上臂贴身不动，弯举至顶峰收缩二头肌，下放控制离心3秒",
+  "锤式弯举": "掌心相对握法(锤式)，重点刺激肱桡肌和前臂，动作同杠铃弯举",
+  "绳索三头下压": "上臂夹紧身体不动，下压至手臂完全伸直，肱三头肌顶峰收缩",
+  "罗马尼亚硬拉（RDL）": "膝盖微屈，臀部向后推，杠铃沿小腿下降，腰背始终挺直",
+  "哑铃罗马尼亚硬拉": "同罗马尼亚硬拉，双手各持哑铃，感受腘绳肌拉伸",
+  "前蹲（或高杠深蹲）": "杠铃架在锁骨/三角肌前束，肘部抬高，躯干更直立，股四主导",
+  "保加利亚分腿蹲": "后脚搭凳，前脚足够远使膝盖不超脚尖，下蹲至大腿平行",
+  "腿举": "脚与肩同宽，膝盖90°弯曲后蹬直但不锁死，全程背部贴紧靠垫",
+  "坐姿腿屈伸": "脚踝勾滚轮，大腿发力向前踢直到伸直，顶峰收缩股四头肌",
+  "坐姿腿弯举": "脚踝勾滚轮，腘绳肌发力向后弯举，顶峰收缩后缓慢下放",
+  "俯卧腿弯举": "俯卧姿势，脚踝勾滚轮，腘绳肌发力弯举至接近臀部",
+  "站姿小腿提踵": "脚掌前部踩台阶，下放至最低后尽力踮起到最高，腓肠肌收缩",
+  "坐姿小腿提踵": "坐姿重心在膝盖上方，脚掌踩踏板踮起，重点刺激比目鱼肌",
+  "平板支撑": "肘在肩正下方，头背臀脚呈一直线，核心收紧，臀部不塌不翘"
+};
+
+function openModal(exerciseName) {
+  const imgSrc = EX_IMAGES[exerciseName];
+  if (!imgSrc) return;
+  document.getElementById("modal-img").src = imgSrc;
+  document.getElementById("modal-title").textContent = exerciseName;
+  const tips = EX_TIPS[exerciseName] || "注意动作规范，感受目标肌肉发力";
+  document.getElementById("modal-tips").innerHTML = `<strong>动作要领：</strong>${tips}`;
+  document.getElementById("ex-modal").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document.getElementById("ex-modal").classList.remove("show");
+  document.body.style.overflow = "";
+}
+
 let currentDay = null;
 let currentDate = new Date(); // tracks the specific selected date
 
@@ -825,7 +1000,8 @@ function render(dayKey, specificDate) {
   } else {
     html += `<table class="exercise-table"><thead><tr><th>动作</th><th style="text-align:right">组数×次数</th></tr></thead><tbody>`;
     plan.exercises.forEach(e => {
-      html += `<tr><td><div class="ex-name">${e.name}</div><div class="ex-muscle">${e.muscle}</div></td><td style="text-align:right"><span class="sets-badge">${e.sr}</span></td></tr>`;
+      const hasImg = EX_IMAGES[e.name] ? '' : 'style="display:none"';
+      html += `<tr><td><div class="ex-name">${e.name}<button class="ex-img-btn" onclick="event.stopPropagation();openModal('${e.name.replace(/'/g, "\\'")}')" ${hasImg} title="查看动作示范">🎯 动作示范</button></div><div class="ex-muscle">${e.muscle}</div></td><td style="text-align:right"><span class="sets-badge">${e.sr}</span></td></tr>`;
     });
     html += `</tbody></table><div class="duration">⏱ 预计时长：${plan.duration}</div>`;
   }
