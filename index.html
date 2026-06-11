@@ -582,13 +582,13 @@ function getWeekStart(d) {
 }
 
 function getDateForDay(dayKey) {
-  const today = new Date();
-  const now = new Date();
-  const todayIdx = today.getDay();
+  const weekStart = getWeekStart(new Date());
+  // DAYS order: ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"]
   const targetIdx = DAYS.indexOf(dayKey);
-  const diff = targetIdx - todayIdx;
-  const targetDate = new Date(now);
-  targetDate.setDate(now.getDate() + diff);
+  // weekStart is Monday (index 1). offset: Mon=0, Tue=1, ..., Sat=5, Sun=6
+  const offset = targetIdx === 0 ? 6 : targetIdx - 1;
+  const targetDate = new Date(weekStart);
+  targetDate.setDate(weekStart.getDate() + offset);
   return targetDate;
 }
 
