@@ -581,16 +581,29 @@ function getWeekStart(d) {
   return monday;
 }
 
+function getDateForDay(dayKey) {
+  const today = new Date();
+  const now = new Date();
+  const todayIdx = today.getDay();
+  const targetIdx = DAYS.indexOf(dayKey);
+  const diff = targetIdx - todayIdx;
+  const targetDate = new Date(now);
+  targetDate.setDate(now.getDate() + diff);
+  return targetDate;
+}
+
 function render(dayKey) {
   currentDay = dayKey;
   const plan = PLAN[dayKey];
   const now = new Date();
   const todayKey = getTodayKey();
+  const selectedDate = getDateForDay(dayKey);
+  const isToday = dayKey === todayKey;
 
-  document.title = `今日健身计划 · ${DAY_CN[DAYS.indexOf(dayKey)]}`;
+  document.title = `${isToday ? '今日' : DAY_CN[DAYS.indexOf(dayKey)]}健身计划 · ${DAY_CN[DAYS.indexOf(dayKey)]}`;
 
-  // Header
-  document.getElementById("hdr-date").textContent = formatDate(now);
+  // Header — shows the actual date for the selected day
+  document.getElementById("hdr-date").textContent = formatDate(selectedDate);
   document.getElementById("hdr-title").textContent =
     plan.type === "rest" ? "休息日 · 完全恢复" :
     plan.type === "light" ? "轻度恢复日" :
@@ -604,13 +617,16 @@ function render(dayKey) {
   const nav = document.getElementById("day-nav");
   nav.innerHTML = DAYS.map((k,i) => {
     const p = PLAN[k];
+    const d = getDateForDay(k);
+    const isDayToday = k === todayKey;
     const cls = [
       "day-nav-btn",
       k === dayKey ? "active" : "",
       p.type === "training" ? "has-training" : "has-rest"
     ].filter(Boolean).join(" ");
     const dot = p.type === "training" ? "🏋️ " : p.type === "light" ? "🚶 " : "🌿 ";
-    return `<button class="${cls}" onclick="render('${k}')">${dot}${DAY_CN[i]}</button>`;
+    const todayMark = isDayToday ? ' <span style="font-size:0.6rem;vertical-align:super">今天</span>' : '';
+    return `<button class="${cls}" onclick="render('${k}')">${dot}${d.getDate()}日 ${DAY_CN[i]}${todayMark}</button>`;
   }).join("");
 
   // Content
