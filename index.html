@@ -648,6 +648,9 @@
 <body>
 
 <div class="header">
+  <div style="position:absolute;right:16px;top:calc(20px + env(safe-area-inset-top, 0px));z-index:20">
+    <a href="exercises-library.html" style="color:rgba(255,255,255,0.9);text-decoration:none;font-size:0.78rem;font-weight:600;padding:4px 12px;border:1.5px solid rgba(255,255,255,0.3);border-radius:16px;display:inline-block">💪 动作库</a>
+  </div>
   <div class="header-date" id="hdr-date"></div>
   <h1 id="hdr-title"></h1>
   <div class="day-type" id="hdr-tag"></div>
@@ -691,7 +694,7 @@
 </div>
 
 <footer>
-  55kg → 65kg · 16周增重计划 · 每日自动更新<br>
+  55kg → 65kg · 16周增重计划 · 每日自动更新 · <a href="exercises-library.html" style="color:rgba(255,255,255,0.7)">💪 动作库</a><br>
   <span style="font-size:0.7rem">训练日一二四五 · 休息日三六日 · 第1-4周适应期</span>
 </footer>
 
@@ -1030,7 +1033,7 @@ function render(dayKey, specificDate) {
     html += `<table class="exercise-table"><thead><tr><th>动作</th><th style="text-align:right">组数×次数</th></tr></thead><tbody>`;
     plan.exercises.forEach(e => {
       const hasImg = EX_IMAGES[e.name] ? '' : 'style="display:none"';
-      html += `<tr><td><div class="ex-name">${e.name}<button class="ex-img-btn" onclick="event.stopPropagation();openModal('${e.name.replace(/'/g, "\\'")}')" ${hasImg} title="查看动作示范">🎯 动作示范</button></div><div class="ex-muscle">${e.muscle}</div></td><td style="text-align:right"><span class="sets-badge">${e.sr}</span></td></tr>`;
+      html += `<tr><td><div class="ex-name">${e.name}<button class="ex-img-btn" onclick="event.stopPropagation();openModal('${e.name.replace(/'/g, "\\'")}')" ${hasImg} title="查看动作示范">🎯</button><button class="ex-img-btn" onclick="event.stopPropagation();window.open('exercises-library.html?search='+encodeURIComponent('${e.name.replace(/'/g, "\\'")}'),'_self')" title="在动作库中查看详情">📖</button></div><div class="ex-muscle">${e.muscle}</div></td><td style="text-align:right"><span class="sets-badge">${e.sr}</span></td></tr>`;
     });
     html += `</tbody></table><div class="duration">⏱ 预计时长：${plan.duration}</div>`;
   }
