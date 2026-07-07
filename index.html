@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=2.0">
 <meta name="theme-color" content="#667eea">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -237,6 +237,16 @@
     border-radius: 10px;
   }
 
+  .complete-btn {
+    display: block; width: 100%; margin-top: 14px; padding: 12px;
+    border: 2px solid var(--green); border-radius: 12px;
+    background: white; color: var(--green);
+    font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .complete-btn.done { background: var(--green); color: white; }
+  .complete-btn:active { transform: scale(0.97); }
+
   /* ===== MEALS ===== */
   .meal-row {
     display: flex;
@@ -395,6 +405,11 @@
   .card:nth-child(3) { animation-delay: 0.15s; }
   .card:nth-child(4) { animation-delay: 0.2s; }
 
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    .card { animation: none; }
+  }
+
   /* ===== MONTH CALENDAR ===== */
   .cal-card {
     background: var(--card-bg);
@@ -494,6 +509,7 @@
   .cal-dot.rest { background: #22c55e; }
   .cal-dot.light { background: #f59e0b; }
   .cal-dot.completed { background: #cbd5e1; }
+  .cal-dot.done { background: #16a34a; box-shadow: 0 0 0 2px #bbf7d0; }
   .cal-cell.active .cal-dot { background: rgba(255,255,255,0.7); }
 
   /* out-of-plan / completed-plan */
@@ -643,6 +659,91 @@
     transition: all 0.15s;
   }
   .ex-img-btn:active { background: var(--purple); color: white; transform: scale(0.95); }
+
+  /* ===== REST TIMER ===== */
+  .timer-card { text-align: center; }
+  .timer-display {
+    font-size: 3.5rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    margin: 8px 0;
+    color: var(--text);
+    font-family: "SF Mono", "Menlo", monospace;
+    letter-spacing: 4px;
+  }
+  .timer-display.running { color: var(--purple); }
+  .timer-presets { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .timer-preset {
+    padding: 6px 16px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .timer-preset.active { border-color: var(--purple); background: var(--purple-light); color: var(--purple-dark); }
+  .timer-preset:active { transform: scale(0.95); }
+  .timer-actions { display: flex; gap: 10px; justify-content: center; }
+  .timer-btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .timer-btn:active { transform: scale(0.95); }
+  .timer-btn-primary { background: var(--purple); color: white; }
+  .timer-btn-primary:disabled { opacity: 0.4; cursor: default; }
+  .timer-btn-secondary { background: var(--gray-light); color: var(--text-secondary); }
+  .timer-hint { font-size: 0.75rem; color: #a0aec0; margin-top: 8px; }
+
+  /* ===== TRAINING LOG ===== */
+  .log-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .log-input {
+    width: 48px;
+    padding: 4px 6px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .log-input:focus { border-color: var(--purple); }
+  .log-x { color: #a0aec0; font-weight: 600; font-size: 0.75rem; }
+  .log-save-btn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 8px;
+    background: var(--purple-light);
+    color: var(--purple-dark);
+    font-size: 0.68rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .log-save-btn:active { background: var(--purple); color: white; }
+  .log-save-btn.saved { background: var(--green-light); color: var(--green); }
+  .log-last {
+    font-size: 0.65rem;
+    color: #a0aec0;
+    width: 100%;
+    text-align: right;
+    margin-top: 2px;
+  }
 </style>
 </head>
 <body>
@@ -656,7 +757,7 @@
   <div class="day-type" id="hdr-tag"></div>
 </div>
 
-<div class="day-nav" id="day-nav"></div>
+<div class="day-nav" id="day-nav" role="tablist" aria-label="星期导航"></div>
 
 <div class="cal-card" id="cal-card">
   <div class="cal-header">
@@ -678,11 +779,11 @@
 <div class="container" id="content"></div>
 
 <!-- Exercise Image Modal -->
-<div class="modal-overlay" id="ex-modal" onclick="closeModal()">
+<div class="modal-overlay" id="ex-modal" onclick="closeModal()" role="dialog" aria-modal="true" aria-label="动作示范">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-header">
       <span class="modal-title" id="modal-title"></span>
-      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <button class="modal-close" onclick="closeModal()" aria-label="关闭">&times;</button>
     </div>
     <div class="modal-body">
       <img id="modal-img" src="" alt="" style="display:none">
@@ -922,6 +1023,8 @@ function openModal(exerciseName) {
   document.getElementById("modal-tips").innerHTML = `<strong>动作要领：</strong>${tips}<br>${libraryLink}`;
   document.getElementById("ex-modal").classList.add("show");
   document.body.style.overflow = "hidden";
+  // Focus the close button for accessibility
+  setTimeout(() => document.querySelector(".modal-close")?.focus(), 100);
 
   // Trigger image load AFTER modal is visible
   requestAnimationFrame(() => {
@@ -947,8 +1050,204 @@ function closeModal() {
   img.src = "";
 }
 
+// Keyboard: Escape closes modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
 let currentDay = null;
 let currentDate = new Date(); // tracks the specific selected date
+
+// ===== Completion Check-in =====
+function getCompletedDays() {
+  try {
+    const data = localStorage.getItem('fp_completed_days');
+    return data ? JSON.parse(data) : [];
+  } catch(e) { return []; }
+}
+
+function saveCompletedDays(days) {
+  try { localStorage.setItem('fp_completed_days', JSON.stringify(days)); } catch(e) {}
+}
+
+function isCompleted(dateStr) {
+  return getCompletedDays().includes(dateStr);
+}
+
+function toggleComplete(dateStr) {
+  let days = getCompletedDays();
+  const idx = days.indexOf(dateStr);
+  if (idx >= 0) {
+    days.splice(idx, 1);
+  } else {
+    days.push(dateStr);
+  }
+  saveCompletedDays(days);
+  return days.includes(dateStr);
+}
+
+function getTodayStr() {
+  return currentDate.toISOString().slice(0, 10);
+}
+
+function toggleDayComplete() {
+  const dateStr = getTodayStr();
+  const nowDone = toggleComplete(dateStr);
+  const btn = document.querySelector('.complete-btn');
+  if (btn) {
+    btn.textContent = nowDone ? '✅ 已完成' : '⬜ 标记已完成';
+    btn.classList.toggle('done', nowDone);
+  }
+  renderCalendar();
+}
+
+// ===== Training Log =====
+function saveLog(dateStr, exName, idx) {
+  const wEl = document.getElementById('log-w-' + idx);
+  const rEl = document.getElementById('log-r-' + idx);
+  const btn = document.getElementById('log-btn-' + idx);
+  const last = document.getElementById('log-last-' + idx);
+  const weight = parseFloat(wEl.value);
+  const reps = parseInt(rEl.value);
+  if (!weight || !reps) return;
+  saveTrainingLogRecord(dateStr, exName, weight, reps);
+  btn.textContent = '✓ 已存';
+  btn.classList.add('saved');
+  last.textContent = '上次: ' + weight + 'kg × ' + reps;
+}
+
+function getTrainingLog() {
+  try { const d = localStorage.getItem('fp_training_log'); return d ? JSON.parse(d) : {}; } catch(e) { return {}; }
+}
+
+function saveTrainingLogRecord(dateStr, exName, weight, reps) {
+  const log = getTrainingLog();
+  if (!log[dateStr]) log[dateStr] = {};
+  log[dateStr][exName] = { weight: weight, reps: reps };
+  try { localStorage.setItem('fp_training_log', JSON.stringify(log)); } catch(e) {}
+}
+
+function getLastWeight(exerciseName, currentDateStr) {
+  const log = getTrainingLog();
+  let lastEntry = null;
+  for (const [dateStr, exercises] of Object.entries(log)) {
+    if (dateStr >= currentDateStr) continue;
+    if (exercises[exerciseName]) {
+      if (!lastEntry || dateStr > lastEntry.date) {
+        lastEntry = { date: dateStr, ...exercises[exerciseName] };
+      }
+    }
+  }
+  return lastEntry;
+}
+
+// ===== Rest Timer =====
+const timerState = {
+  running: false, timeLeft: 0, duration: 120, interval: null
+};
+
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.value = 0.3;
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
+    setTimeout(function() {
+      const o2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.frequency.value = 880;
+      o2.type = 'sine';
+      g2.gain.value = 0.3;
+      o2.start();
+      o2.stop(ctx.currentTime + 0.25);
+    }, 300);
+  } catch(e) {}
+}
+
+function startTimer() {
+  if (timerState.running) return;
+  timerState.running = true;
+  timerState.interval = setInterval(function() {
+    timerState.timeLeft--;
+    updateTimerDisplay();
+    if (timerState.timeLeft <= 0) {
+      stopTimer(true);
+      beep();
+      try { navigator.vibrate(500); } catch(e) {}
+    }
+  }, 1000);
+}
+
+function stopTimer(completed) {
+  timerState.running = false;
+  if (timerState.interval) {
+    clearInterval(timerState.interval);
+    timerState.interval = null;
+  }
+  updateTimerDisplay();
+  updateTimerButtons(completed);
+}
+
+function resetTimer() {
+  stopTimer(false);
+  timerState.timeLeft = timerState.duration;
+  updateTimerDisplay();
+  updateTimerButtons(false);
+}
+
+function setTimerDuration(secs) {
+  timerState.duration = secs;
+  if (!timerState.running) {
+    timerState.timeLeft = secs;
+    updateTimerDisplay();
+  }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer-display');
+  if (!el) return;
+  const m = String(Math.floor(timerState.timeLeft / 60)).padStart(2, '0');
+  const s = String(timerState.timeLeft % 60).padStart(2, '0');
+  el.textContent = m + ':' + s;
+  el.classList.toggle('running', timerState.running && timerState.timeLeft > 0);
+}
+
+function updateTimerButtons(completed) {
+  const startBtn = document.getElementById('timer-start');
+  const resetBtn = document.getElementById('timer-reset');
+  if (!startBtn || !resetBtn) return;
+  if (completed) {
+    startBtn.disabled = true;
+    startBtn.textContent = '✅ 完成';
+    startBtn.style.opacity = '0.5';
+  } else if (timerState.running) {
+    startBtn.textContent = '⏸ 暂停';
+    startBtn.onclick = function() { stopTimer(false); };
+  } else {
+    startBtn.disabled = false;
+    startBtn.textContent = '▶ 开始';
+    startBtn.style.opacity = '1';
+    startBtn.onclick = startTimer;
+  }
+}
+
+function timerPreset(secs) {
+  return function() {
+    if (timerState.running) return;
+    setTimerDuration(secs);
+    resetTimer();
+    document.querySelectorAll('.timer-preset').forEach(function(b) {
+      b.classList.toggle('active', parseInt(b.dataset.secs) === secs);
+    });
+  };
+}
+// =====
 
 function getTodayKey() {
   return DAYS[new Date().getDay()];
@@ -982,6 +1281,7 @@ function render(dayKey, specificDate) {
   currentDay = dayKey;
   if (specificDate) currentDate = specificDate;
   const plan = PLAN[dayKey];
+  const dateStr = getTodayStr();
   const now = new Date();
   const todayKey = getTodayKey();
   const selectedDate = specificDate ? new Date(specificDate) : getDateForDay(dayKey);
@@ -1032,13 +1332,44 @@ function render(dayKey, specificDate) {
     html += '<div class="light-badge">🚶 拉伸 / 轻度有氧<br><span style="font-size:0.82rem;color:#718096;font-weight:400;margin-top:4px;display:block">时长：30~45 分钟 · 注重拉伸与放松</span></div>';
   } else {
     html += `<table class="exercise-table"><thead><tr><th>动作</th><th style="text-align:right">组数×次数</th></tr></thead><tbody>`;
-    plan.exercises.forEach(e => {
+    plan.exercises.forEach((e, idx) => {
       const hasImg = EX_IMAGES[e.name] ? '' : 'style="display:none"';
-      html += `<tr><td><div class="ex-name">${e.name}<button class="ex-img-btn" onclick="event.stopPropagation();openModal('${e.name.replace(/'/g, "\\'")}')" ${hasImg} title="查看动作示范">🎯</button><button class="ex-img-btn" onclick="event.stopPropagation();window.open('exercises-library.html?search='+encodeURIComponent('${e.name.replace(/'/g, "\\'")}'),'_self')" title="在动作库中查看详情">📖</button></div><div class="ex-muscle">${e.muscle}</div></td><td style="text-align:right"><span class="sets-badge">${e.sr}</span></td></tr>`;
+      const safeName = e.name.replace(/'/g, "\\'");
+      const lastEntry = getLastWeight(e.name, dateStr);
+      const lastText = lastEntry ? ('上次: ' + lastEntry.weight + 'kg × ' + lastEntry.reps) : '';
+      const log = getTrainingLog();
+      const savedData = (log[dateStr] && log[dateStr][e.name]) ? log[dateStr][e.name] : null;
+      const savedW = savedData ? savedData.weight : '';
+      const savedR = savedData ? savedData.reps : '';
+      const savedClass = savedData ? ' saved' : '';
+      const savedText = savedData ? '✓ 已存' : '保存';
+      html += `<tr><td><div class="ex-name">${e.name}<button class="ex-img-btn" onclick="event.stopPropagation();openModal('${safeName}')" ${hasImg} title="查看动作示范">🎯</button><button class="ex-img-btn" onclick="event.stopPropagation();window.open('exercises-library.html?search='+encodeURIComponent('${safeName}'),'_self')" title="在动作库中查看详情">📖</button></div><div class="ex-muscle">${e.muscle}</div></td><td style="text-align:right"><span class="sets-badge">${e.sr}</span><div class="log-row"><input type="number" class="log-input" placeholder="kg" id="log-w-${idx}" value="${savedW}" inputmode="decimal" step="0.5" min="0"><span class="log-x">×</span><input type="number" class="log-input" placeholder="次" id="log-r-${idx}" value="${savedR}" inputmode="numeric" min="0"><button class="log-save-btn${savedClass}" onclick="saveLog('${dateStr}','${safeName}',${idx})" id="log-btn-${idx}">${savedText}</button><span class="log-last" id="log-last-${idx}">${lastText}</span></div></td></tr>`;
     });
     html += `</tbody></table><div class="duration">⏱ 预计时长：${plan.duration}</div>`;
   }
+  // Completion button
+  const done = isCompleted(dateStr);
+  html += `<button class="complete-btn${done ? ' done' : ''}" onclick="toggleDayComplete()">${done ? '✅ 已完成' : '⬜ 标记已完成'}</button>`;
   html += '</div>';
+
+  // Rest Timer Card (training days only)
+  if (plan.type === "training") {
+    const defaultSecs = plan.focus === "力量" ? 120 : plan.focus === "肌肥大" ? 75 : 90;
+    html += '<div class="card timer-card"><div class="card-title"><span class="icon">⏱️</span> 组间休息计时器</div>';
+    html += '<div class="timer-presets">';
+    html += '<button class="timer-preset' + (defaultSecs === 120 ? ' active' : '') + '" data-secs="120" onclick="timerPreset(120)()">力量 120s</button>';
+    html += '<button class="timer-preset' + (defaultSecs === 90 ? ' active' : '') + '" data-secs="90" onclick="timerPreset(90)()">90s</button>';
+    html += '<button class="timer-preset' + (defaultSecs === 75 ? ' active' : '') + '" data-secs="75" onclick="timerPreset(75)()">肌肥大 75s</button>';
+    html += '<button class="timer-preset' + (defaultSecs === 60 ? ' active' : '') + '" data-secs="60" onclick="timerPreset(60)()">60s</button>';
+    html += '</div>';
+    html += '<div class="timer-display" id="timer-display">' + String(Math.floor(defaultSecs / 60)).padStart(2, '0') + ':' + String(defaultSecs % 60).padStart(2, '0') + '</div>';
+    html += '<div class="timer-actions">';
+    html += '<button class="timer-btn timer-btn-primary" id="timer-start" onclick="startTimer()">▶ 开始</button>';
+    html += '<button class="timer-btn timer-btn-secondary" id="timer-reset" onclick="resetTimer()">↺ 重置</button>';
+    html += '</div>';
+    html += '<div class="timer-hint">⏎ 切换日期自动重置 · 结束后震动+提示音</div>';
+    html += '</div>';
+  }
 
   // Meals Card
   html += '<div class="card"><div class="card-title"><span class="icon">🍽️</span> 今日饮食</div>';
@@ -1099,6 +1430,15 @@ function render(dayKey, specificDate) {
   html += '</div></div>';
 
   container.innerHTML = html;
+
+  // Timer init for this day
+  resetTimer();
+  const defaultSecs = plan.focus === "力量" ? 120 : plan.focus === "肌肥大" ? 75 : 90;
+  setTimerDuration(defaultSecs);
+  document.querySelectorAll('.timer-preset').forEach(function(b) {
+    b.classList.toggle('active', parseInt(b.dataset.secs) === defaultSecs);
+  });
+  updateTimerButtons(false);
 
   // Update calendar to highlight selected day
   renderCalendar();
@@ -1190,11 +1530,14 @@ function renderCalendar() {
     }
     if (isToday) cls += " today";
     if (isActive) cls += " active";
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isDone = !isBeforePlan && isCompleted(dateStr);
 
     const dotCls = ptype === "training" ? "train" : ptype === "light" ? "light" : "rest";
+    const extraDot = isDone ? ' done' : '';
     const onClick = (isBeforePlan) ? '' : `onclick="calSelectDate(${calYear},${calMonth},${d})"`;
     const label = isBeforePlan ? '<span style="opacity:0.3">-</span>' :
-      `<span>${d}</span><span class="cal-dot ${isAfterPlan ? 'completed' : dotCls}"></span>`;
+      `<span>${d}</span><span class="cal-dot ${isAfterPlan ? 'completed' : dotCls}${extraDot}"></span>`;
 
     cells += `<div class="${cls}" ${onClick}>${label}</div>`;
   }
@@ -1233,7 +1576,7 @@ function renderCalendar() {
   } else {
     phase = getCurrentPhase(midMonth);
   }
-  const phaseProgress = Math.min(100, Math.max(0, ((weekNum - phase.week + 1) / Math.max(1, phase.to - phase.week + 1)) * 100));
+  const phaseProgress = weekNum < 1 ? 0 : Math.min(100, Math.max(0, ((weekNum - phase.week + 1) / Math.max(1, phase.to - phase.week + 1)) * 100));
 
   document.getElementById("month-phase").innerHTML = `
     <span class="month-phase-label">📍 ${phase.name} · ${phase.range}</span>
@@ -1276,6 +1619,11 @@ function calGoToday() {
 
 // Init
 render(getTodayKey(), new Date());
+
+// Register service worker for offline support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function() {});
+}
 </script>
 
 </body>
