@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "\u5065\u8eab App \u7ec4\u4ef6\u4ea4\u4e92\u5e8f\u5217",
+    "subtitle": "\u4ece\u9875\u9762\u52a0\u8f7d\u5230\u8ba1\u5212\u6e32\u67d3\u3001\u52a8\u4f5c\u5e93\u8df3\u8f6c\u3001\u793a\u8303\u56fe\u67e5\u770b\u7684\u5b8c\u6574\u4ea4\u4e92",
+    "output": "fitness-sequence.html",
+    "viewBox": [
+      900,
+      900
+    ]
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "\u7528\u6237",
+      "sublabel": "\u6d4f\u89c8\u5668"
+    },
+    {
+      "id": "page",
+      "type": "frontend",
+      "label": "index.html",
+      "sublabel": "PWA \u4e3b\u9875\u9762"
+    },
+    {
+      "id": "plan",
+      "type": "database",
+      "label": "PLAN \u6570\u636e",
+      "sublabel": "7\u5929\u8ba1\u5212\u5bf9\u8c61"
+    },
+    {
+      "id": "library",
+      "type": "frontend",
+      "label": "\u52a8\u4f5c\u5e93\u9875\u9762",
+      "sublabel": "exercises-library.html"
+    },
+    {
+      "id": "dataset",
+      "type": "database",
+      "label": "JSON \u6570\u636e\u96c6",
+      "sublabel": "1324 \u4e2a\u52a8\u4f5c"
+    },
+    {
+      "id": "images",
+      "type": "cloud",
+      "label": "exercises/",
+      "sublabel": "\u793a\u8303\u56fe\u6587\u4ef6"
+    }
+  ],
+  "segments": [
+    {
+      "from": 100,
+      "to": 224,
+      "label": "\u521d\u59cb\u5316"
+    },
+    {
+      "from": 244,
+      "to": 388,
+      "label": "\u6d4f\u89c8\u8ba1\u5212"
+    },
+    {
+      "from": 408,
+      "to": 520,
+      "label": "\u52a8\u4f5c\u793a\u8303"
+    },
+    {
+      "from": 540,
+      "to": 700,
+      "label": "\u52a8\u4f5c\u5e93"
+    }
+  ],
+  "messages": [
+    {
+      "from": "user",
+      "to": "page",
+      "y": 160,
+      "label": "\u6253\u5f00\u7f51\u9875",
+      "variant": "default"
+    },
+    {
+      "from": "page",
+      "to": "plan",
+      "y": 203,
+      "label": "render(todayKey)",
+      "variant": "emphasis"
+    },
+    {
+      "from": "plan",
+      "to": "page",
+      "y": 240,
+      "label": "PLAN[monday] \u2192 HTML",
+      "variant": "return"
+    },
+    {
+      "from": "page",
+      "to": "user",
+      "y": 280,
+      "label": "\u663e\u793a\u8bad\u7ec3\u8ba1\u5212 + \u996e\u98df",
+      "variant": "return"
+    },
+    {
+      "from": "user",
+      "to": "page",
+      "y": 320,
+      "label": "\u70b9\u51fb\u65e5\u5bfc\u822a\u6309\u94ae",
+      "variant": "default"
+    },
+    {
+      "from": "page",
+      "to": "plan",
+      "y": 363,
+      "label": "render('wednesday')",
+      "variant": "emphasis"
+    },
+    {
+      "from": "plan",
+      "to": "page",
+      "y": 403,
+      "label": "PLAN[wednesday] \u2192 \u4f11\u606f\u65e5",
+      "variant": "return"
+    },
+    {
+      "from": "page",
+      "to": "user",
+      "y": 445,
+      "label": "\u663e\u793a\u4f11\u606f\u65e5\u5185\u5bb9",
+      "variant": "return"
+    },
+    {
+      "from": "user",
+      "to": "page",
+      "y": 479,
+      "label": "\u70b9\u51fb \ud83c\udfaf",
+      "variant": "default"
+    },
+    {
+      "from": "page",
+      "to": "images",
+      "y": 521,
+      "label": "openModal() \u52a0\u8f7d\u56fe\u7247",
+      "variant": "emphasis"
+    },
+    {
+      "from": "images",
+      "to": "page",
+      "y": 555,
+      "label": "\u6760\u94c3\u5367\u63a8.jpg",
+      "variant": "return"
+    },
+    {
+      "from": "page",
+      "to": "user",
+      "y": 535,
+      "label": "\u5f39\u7a97\u663e\u793a\u793a\u8303\u56fe + \u8981\u9886",
+      "variant": "return"
+    },
+    {
+      "from": "user",
+      "to": "page",
+      "y": 593,
+      "label": "\u70b9\u51fb \ud83d\udcd6",
+      "variant": "default"
+    },
+    {
+      "from": "page",
+      "to": "library",
+      "y": 624,
+      "label": "window.open('exercises-library.html?search=\u6760\u94c3\u5367\u63a8')",
+      "variant": "emphasis"
+    },
+    {
+      "from": "library",
+      "to": "dataset",
+      "y": 661,
+      "label": "fetch + \u89e3\u6790 JSON",
+      "variant": "emphasis"
+    },
+    {
+      "from": "dataset",
+      "to": "library",
+      "y": 697,
+      "label": "1324 \u6761\u52a8\u4f5c\u8bb0\u5f55",
+      "variant": "return"
+    },
+    {
+      "from": "library",
+      "to": "user",
+      "y": 735,
+      "label": "\u663e\u793a\u7b5b\u9009\u7ed3\u679c + \u8be6\u60c5",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "page",
+      "from": 155,
+      "to": 570,
+      "type": "frontend"
+    },
+    {
+      "participant": "plan",
+      "from": 198,
+      "to": 410,
+      "type": "database"
+    },
+    {
+      "participant": "library",
+      "from": 619,
+      "to": 743,
+      "type": "frontend"
+    },
+    {
+      "participant": "dataset",
+      "from": 656,
+      "to": 705,
+      "type": "database"
+    },
+    {
+      "participant": "images",
+      "from": 516,
+      "to": 560,
+      "type": "cloud"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "\u9875\u9762\u521d\u59cb\u5316",
+      "items": [
+        "\u6253\u5f00\u5373\u8c03\u7528 getTodayKey() + render()",
+        "PLAN \u5bf9\u8c61\u5728 script \u4e2d\u786c\u7f16\u7801\uff0c\u65e0\u9700\u7f51\u7edc\u8bf7\u6c42",
+        "render() \u6839\u636e day type \u751f\u6210\u4e0d\u540c\u7684 HTML \u7ed3\u6784"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "\u8ba1\u5212\u6d4f\u89c8",
+      "items": [
+        "\u65e5\u5bfc\u822a\u6309\u94ae\u4f20\u9012 dayKey \u91cd\u65b0\u8c03\u7528 render()",
+        "\u6708\u65e5\u5386\u901a\u8fc7 calSelectDate() \u5207\u6362\u65e5\u671f",
+        "\u8bad\u7ec3\u65e5\u542b 6 \u4e2a\u52a8\u4f5c + 6 \u9910 + \u8865\u5242\u63d0\u9192"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "\u52a8\u4f5c\u5e93\u8df3\u8f6c",
+      "items": [
+        "\ud83d\udcd6 \u6309\u94ae encode search \u53c2\u6570\u5230 URL \u5b9e\u73b0\u7cbe\u786e\u8df3\u8f6c",
+        "\u52a8\u4f5c\u5e93\u52a0\u8f7d\u540e\u89e3\u6790 URL param \u81ea\u52a8\u5b9a\u4f4d",
+        "\u7eaf\u524d\u7aef\u9759\u6001\u65b9\u6848\uff0c\u65e0\u9700\u540e\u7aef API"
+      ]
+    }
+  ]
+}

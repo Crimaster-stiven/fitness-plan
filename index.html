@@ -918,7 +918,8 @@ function openModal(exerciseName) {
 
   document.getElementById("modal-title").textContent = exerciseName;
   const tips = EX_TIPS[exerciseName] || "注意动作规范，感受目标肌肉发力";
-  document.getElementById("modal-tips").innerHTML = `<strong>动作要领：</strong>${tips}`;
+  const libraryLink = `<a href="exercises-library.html?search=${encodeURIComponent(exerciseName)}" style="display:inline-block;margin-top:8px;font-size:0.78rem;color:var(--accent, #667eea);text-decoration:none">🎬 在动作库查看动画示范 →</a>`;
+  document.getElementById("modal-tips").innerHTML = `<strong>动作要领：</strong>${tips}<br>${libraryLink}`;
   document.getElementById("ex-modal").classList.add("show");
   document.body.style.overflow = "hidden";
 

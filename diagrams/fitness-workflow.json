@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "健身增重计划 App 用户流程",
+    "subtitle": "从打开到查看计划、浏览动作库",
+    "output": "fitness-workflow.html",
+    "viewBox": [1200, 800]
+  },
+  "lanes": [
+    { "id": "user", "label": "用户操作" },
+    { "id": "plan", "label": "计划页面" },
+    { "id": "library", "label": "动作库" },
+    { "id": "data", "label": "数据层" }
+  ],
+  "phases": [
+    { "id": "enter", "label": "进入", "fromCol": 0, "toCol": 1 },
+    { "id": "browse", "label": "浏览计划", "fromCol": 2, "toCol": 2, "variant": "emphasis" },
+    { "id": "explore", "label": "探索动作", "fromCol": 3, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["open", "auto_today", "view_plan", "open_library", "filter_search", "view_detail", "back"],
+  "nodes": [
+    { "id": "open", "lane": "user", "col": 0, "type": "external", "label": "打开网页" },
+    { "id": "switch_day", "lane": "user", "col": 1, "type": "external", "label": "切换日期" },
+    { "id": "back", "lane": "user", "col": 5, "type": "external", "label": "返回计划" },
+    { "id": "auto_today", "lane": "plan", "col": 0, "type": "frontend", "label": "自动定位今日" },
+    { "id": "view_plan", "lane": "plan", "col": 2, "type": "frontend", "label": "计划详情", "sublabel": "训练 + 饮食 + 补剂", "tag": "核心" },
+    { "id": "show_modal", "lane": "plan", "col": 4, "type": "frontend", "label": "示范弹窗", "sublabel": "图片 + 动作要领" },
+    { "id": "open_library", "lane": "library", "col": 2, "type": "frontend", "label": "打开动作库", "sublabel": "exercises-library" },
+    { "id": "filter_search", "lane": "library", "col": 4, "type": "backend", "label": "筛选搜索", "sublabel": "部位·器材·关键词" },
+    { "id": "view_detail", "lane": "library", "col": 5, "type": "frontend", "label": "动作详情", "sublabel": "完整说明 + 步骤" },
+    { "id": "plan_data", "lane": "data", "col": 0, "type": "database", "label": "PLAN 数据", "sublabel": "7天计划" },
+    { "id": "dataset", "lane": "data", "col": 3, "type": "database", "label": "exercises 数据", "sublabel": "1324 个动作" }
+  ],
+  "edges": [
+    { "from": "open", "to": "auto_today", "variant": "default" },
+    { "from": "auto_today", "to": "plan_data", "variant": "dashed", "role": "branch" },
+    { "from": "auto_today", "to": "view_plan", "variant": "emphasis" },
+    { "from": "switch_day", "to": "view_plan", "label": "选择日期", "variant": "default" },
+    { "from": "view_plan", "to": "show_modal", "label": "🎯 看示范", "variant": "default" },
+    { "from": "view_plan", "to": "open_library", "label": "📖", "variant": "emphasis", "labelAt": [300, 291] },
+    { "from": "open_library", "to": "dataset", "variant": "dashed", "role": "branch" },
+    { "from": "open_library", "to": "filter_search", "variant": "default" },
+    { "from": "filter_search", "to": "view_detail", "variant": "emphasis" },
+    { "from": "view_detail", "to": "back", "variant": "default" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "核心流程",
+      "items": ["打开即自动定位今日计划", "周导航 / 月日历可切换日期", "训练 + 饮食 + 补剂一站式"]
+    },
+    {
+      "dot": "cyan",
+      "title": "动作库集成",
+      "items": ["📖 一键跳转动作库对应动作", "1324 动作可筛选搜索", "深链接 URL 参数传搜索词"]
+    },
+    {
+      "dot": "rose",
+      "title": "交互细节",
+      "items": ["🎯 查看示范图片与要领", "休息日自动隐藏训练模块", "补剂提醒跟随计划展示"]
+    }
+  ]
+}

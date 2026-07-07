@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "\u589e\u91cd\u8ba1\u5212\u751f\u547d\u5468\u671f",
+    "subtitle": "16 \u5468\u6e10\u8fdb\u589e\u91cd \u00b7 \u9636\u6bb5\u6f14\u8fdb \u00b7 \u6bcf\u5468\u8282\u594f \u00b7 \u4f53\u91cd\u8f68\u8ff9",
+    "output": "fitness-lifecycle.html",
+    "viewBox": [
+      1100,
+      660
+    ]
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "\u9636\u6bb5"
+    },
+    {
+      "id": "routine",
+      "label": "\u6bcf\u5468\u8282\u594f"
+    },
+    {
+      "id": "weight",
+      "label": "\u4f53\u91cd\u8f68\u8ff9"
+    },
+    {
+      "id": "terminal",
+      "label": "\u7ec8\u5c40"
+    }
+  ],
+  "states": [
+    {
+      "id": "adapt",
+      "type": "start",
+      "label": "\u9002\u5e94\u671f",
+      "sublabel": "\u7b2c 1-4 \u5468",
+      "lane": "main",
+      "col": 0,
+      "tag": "\u5efa\u7acb\u4e60\u60ef"
+    },
+    {
+      "id": "grow",
+      "type": "active",
+      "label": "\u589e\u808c\u671f",
+      "sublabel": "\u7b2c 5-8 \u5468",
+      "lane": "main",
+      "col": 1,
+      "tag": "\u6e10\u8fdb\u8d85\u8d1f\u8377"
+    },
+    {
+      "id": "accel",
+      "type": "active",
+      "label": "\u52a0\u901f\u671f",
+      "sublabel": "\u7b2c 9-12 \u5468",
+      "lane": "main",
+      "col": 2,
+      "tag": "\u7a81\u7834\u74f6\u9888"
+    },
+    {
+      "id": "consolidate",
+      "type": "active",
+      "label": "\u5de9\u56fa\u671f",
+      "sublabel": "\u7b2c 13-16 \u5468",
+      "lane": "main",
+      "col": 3,
+      "tag": "\u8bc4\u4f30\u6210\u679c"
+    },
+    {
+      "id": "training",
+      "type": "active",
+      "label": "\u8bad\u7ec3\u65e5",
+      "sublabel": "\u5468\u4e00/\u4e8c/\u56db/\u4e94",
+      "lane": "routine",
+      "col": 0,
+      "tag": "\ud83c\udfcb\ufe0f \u529b\u91cf+\u808c\u80a5\u5927"
+    },
+    {
+      "id": "light",
+      "type": "waiting",
+      "label": "\u6062\u590d\u65e5",
+      "sublabel": "\u5468\u516d\u00b7\u6709\u6c27\u62c9\u4f38",
+      "lane": "routine",
+      "col": 1,
+      "tag": "\ud83d\udeb6 \u4e3b\u52a8\u6062\u590d"
+    },
+    {
+      "id": "rest",
+      "type": "waiting",
+      "label": "\u4f11\u606f\u65e5",
+      "sublabel": "\u5468\u4e09/\u65e5\u00b7\u5b8c\u5168\u6062\u590d",
+      "lane": "routine",
+      "col": 2,
+      "tag": "\ud83c\udf3f \u808c\u8089\u4fee\u590d"
+    },
+    {
+      "id": "w55",
+      "type": "start",
+      "label": "55kg",
+      "sublabel": "\u8d77\u59cb\u4f53\u91cd",
+      "lane": "weight",
+      "col": 0,
+      "tag": "\u8d77\u70b9",
+      "yOffset": 100
+    },
+    {
+      "id": "w57",
+      "type": "active",
+      "label": "57.5kg",
+      "sublabel": "\u9002\u5e94\u671f\u76ee\u6807",
+      "lane": "weight",
+      "col": 1,
+      "tag": "+2.5",
+      "yOffset": 100
+    },
+    {
+      "id": "w60",
+      "type": "active",
+      "label": "60kg",
+      "sublabel": "\u589e\u808c\u671f\u76ee\u6807",
+      "lane": "weight",
+      "col": 1,
+      "tag": "+5",
+      "yOffset": 200
+    },
+    {
+      "id": "w62",
+      "type": "active",
+      "label": "62.5kg",
+      "sublabel": "\u52a0\u901f\u671f\u76ee\u6807",
+      "lane": "weight",
+      "col": 2,
+      "tag": "+7.5",
+      "yOffset": 100
+    },
+    {
+      "id": "w65",
+      "type": "active",
+      "label": "65kg",
+      "sublabel": "\u5de9\u56fa\u671f\u76ee\u6807",
+      "lane": "weight",
+      "col": 2,
+      "tag": "+10",
+      "yOffset": 200
+    },
+    {
+      "id": "done",
+      "type": "success",
+      "label": "\u76ee\u6807\u8fbe\u6210 \u2705",
+      "sublabel": "\u4fdd\u6301 65kg",
+      "lane": "terminal",
+      "col": 0,
+      "tag": "\ud83c\udf89"
+    }
+  ],
+  "transitions": [
+    {
+      "from": "adapt",
+      "to": "grow",
+      "label": "4 \u5468",
+      "variant": "emphasis"
+    },
+    {
+      "from": "grow",
+      "to": "accel",
+      "label": "4 \u5468",
+      "variant": "emphasis"
+    },
+    {
+      "from": "accel",
+      "to": "consolidate",
+      "label": "4 \u5468",
+      "variant": "emphasis"
+    },
+    {
+      "from": "w65",
+      "to": "done",
+      "label": "\ud83c\udfaf \u8fbe\u6210",
+      "variant": "security",
+      "labelAt": [
+        556,
+        550
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "16 \u5468\u9636\u6bb5",
+      "items": [
+        "\u9002\u5e94\u671f(1-4w): \u5efa\u7acb\u8bad\u7ec3\u4e60\u60ef",
+        "\u589e\u808c\u671f(5-8w): \u6e10\u8fdb\u8d85\u8d1f\u8377",
+        "\u52a0\u901f\u671f(9-12w): \u7a81\u7834\u74f6\u9888",
+        "\u5de9\u56fa\u671f(13-16w): \u4fdd\u6301\u8282\u594f"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "\u6bcf\u5468 5+2 \u8282\u594f",
+      "items": [
+        "5 \u5929\u8bad\u7ec3\u65e5: \u529b\u91cf+\u808c\u80a5\u5927\u4ea4\u66ff",
+        "1 \u5929\u6062\u590d\u65e5: \u8f7b\u5ea6\u6709\u6c27\u62c9\u4f38",
+        "2 \u5929\u4f11\u606f\u65e5: \u5b8c\u5168\u6062\u590d"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "\u4f53\u91cd\u8f68\u8ff9",
+      "items": [
+        "55kg \u2192 57.5 \u2192 60 \u2192 62.5 \u2192 65kg",
+        "\u6bcf\u9636\u6bb5 +2.5kg",
+        "\u6bcf\u65e5 2900-3080kcal \u9ad8\u86cb\u767d\u996e\u98df"
+      ]
+    }
+  ]
+}

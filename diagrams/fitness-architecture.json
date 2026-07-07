@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "健身增重计划 App 架构",
+    "subtitle": "16 周增重计划 · 纯前端静态 PWA · 集成 1324 动作库",
+    "output": "fitness-architecture.html"
+  },
+  "components": [
+    { "id": "user", "type": "external", "label": "用户", "sublabel": "浏览器 / 手机", "pos": [40, 300], "size": [120, 60] },
+    { "id": "pwa", "type": "frontend", "label": "index.html", "sublabel": "每日训练计划", "pos": [270, 190], "size": [150, 70], "tag": "PWA" },
+    { "id": "lib", "type": "frontend", "label": "exercises-library.html", "sublabel": "1324 个动作库", "pos": [270, 400], "size": [150, 70], "tag": "筛选 + 搜索" },
+    { "id": "plan", "type": "database", "label": "PLAN 数据", "sublabel": "7天 × 6餐 × 24动作", "pos": [510, 140], "size": [140, 60] },
+    { "id": "dataset", "type": "database", "label": "exercises-dataset.json", "sublabel": "1324 个动作 · 9.7MB", "pos": [510, 280], "size": [150, 60] },
+    { "id": "map", "type": "backend", "label": "exercise-map.js", "sublabel": "中英文名映射", "pos": [510, 430], "size": [140, 60], "tag": "24 个映射" },
+    { "id": "images", "type": "cloud", "label": "exercises/", "sublabel": "20 张动作示范图", "pos": [730, 190], "size": [140, 60] },
+    { "id": "gh", "type": "cloud", "label": "GitHub Pages", "sublabel": "静态托管", "pos": [730, 400], "size": [140, 60], "tag": "自动部署" },
+    { "id": "manifest", "type": "backend", "label": "manifest.json", "sublabel": "PWA 配置", "pos": [510, 530], "size": [130, 50] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "用户端浏览器", "wraps": ["pwa", "lib", "plan", "dataset", "map", "images", "manifest"] },
+    { "kind": "security-group", "label": "训练计划核心", "wraps": ["plan"] }
+  ],
+  "connections": [
+    { "from": "user", "to": "pwa", "label": "访问", "variant": "emphasis" },
+    { "from": "user", "to": "lib", "label": "浏览动作库", "fromSide": "bottom", "toSide": "top", "labelDy": -48 },
+    { "from": "pwa", "to": "plan", "label": "读取", "toSide": "top", "fromSide": "right", "labelAt": [500, 214] },
+    { "from": "pwa", "to": "lib", "label": "跳转", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "labelAt": [345, 274] },
+    { "from": "lib", "to": "dataset", "label": "加载", "toSide": "top", "fromSide": "right", "labelAt": [503, 354] },
+    { "from": "lib", "to": "map", "label": "名称匹配", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "labelDy": 48 },
+    { "from": "pwa", "to": "images", "label": "动作示范", "toSide": "bottom", "fromSide": "right", "labelDy": 48 },
+    { "from": "gh", "to": "lib", "label": "部署", "variant": "dashed" },
+    { "from": "pwa", "to": "manifest", "variant": "dashed", "toSide": "bottom" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "核心功能", "items": ["16 周渐进增重（55kg → 65kg）", "每周 5 练 2 休，训练日自动显示", "每日饮食计划，精确到卡路里和蛋白质"] },
+    { "dot": "cyan", "title": "动作库集成", "items": ["1324 个健身动作，中文说明", "按部位/器材筛选，关键词搜索", "计划动作自动标记 + 一键跳转"] },
+    { "dot": "rose", "title": "技术特点", "items": ["纯静态 HTML/CSS/JS，无后端依赖", "PWA 支持，可添加到主屏幕", "GitHub Pages 自动部署"] }
+  ]
+}

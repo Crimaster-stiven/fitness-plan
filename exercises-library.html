@@ -128,6 +128,12 @@
     gap: 8px;
   }
   .ex-name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+  .ex-name-en { font-size: 0.75rem; color: var(--text-secondary); font-weight: 400; margin-top: 1px; }
+  .ex-thumb {
+    width: 48px; height: 48px; border-radius: 10px; object-fit: cover;
+    background: #f3f4f6; flex-shrink: 0; cursor: pointer;
+  }
+  .ex-header-left { display: flex; gap: 12px; align-items: flex-start; flex: 1; }
   .ex-tags {
     display: flex;
     flex-wrap: wrap;
@@ -212,6 +218,11 @@
   }
   .detail-info-label { color: #9ca3af; font-weight: 500; }
   .detail-info-value { font-weight: 700; color: var(--text); display: block; margin-top: 2px; }
+  .detail-media {
+    width: 100%; border-radius: 10px; margin-bottom: 14px;
+    background: #f3f4f6; display: block; max-height: 260px;
+    object-fit: contain; cursor: pointer;
+  }
   .detail-section-title {
     font-weight: 700;
     font-size: 0.9rem;
@@ -405,7 +416,8 @@ function filterExercises() {
     if (searchQuery) {
       const name = e.name.toLowerCase();
       const zh = e.instructions.zh || '';
-      return name.includes(searchQuery) || zh.includes(searchQuery);
+      const zhName = (e.name_zh || '').toLowerCase();
+      return name.includes(searchQuery) || zh.includes(searchQuery) || zhName.includes(searchQuery);
     }
     return true;
   });
@@ -430,22 +442,29 @@ function renderList() {
   document.getElementById('plan-badge').textContent = planCount > 0 ? '🏋️ 含 ' + planCount + ' 个计划动作' : '';
 
   container.innerHTML = filtered.map((e, i) => {
-    const zhName = ENGLISH_TO_ZH[e.name.toLowerCase()];
+    const zhName = e.name_zh || ENGLISH_TO_ZH[e.name.toLowerCase()];
     const name = zhName || e.name;
     const style = `animation-delay:${(i % 20) * 0.04}s`;
     const catZH = CAT_ZH[e.category] || e.category;
     const bodyZH = BODYPART_ZH[e.body_part] || e.body_part;
     const equipZH = EQUIP_ZH[e.equipment] || e.equipment;
+    const isPlan = !!ENGLISH_TO_ZH[e.name.toLowerCase()];
+    const gifUrl = e.media_id ? `https://static.exercisedb.dev/media/${e.media_id}.gif` : '';
+    const gifThumb = gifUrl ? `<img class="ex-thumb" src="${gifUrl}" alt="${name}" loading="lazy" onclick="event.stopPropagation();showDetail('${e.id}')">` : '';
 
     return `<div class="ex-item" style="${style}" onclick="showDetail('${e.id}')">
       <div class="ex-header">
-        <div>
-          <div class="ex-name">${name}</div>
-          <div class="ex-tags">
-            <span class="ex-tag tag-bodypart">${bodyZH}</span>
-            <span class="ex-tag tag-category">${catZH}</span>
-            <span class="ex-tag tag-equipment">${equipZH}</span>
-            ${zhName ? '<span class="ex-tag tag-plan">📋 计划动作</span>' : ''}
+        <div class="ex-header-left">
+          ${gifThumb}
+          <div>
+            <div class="ex-name">${name}</div>
+            ${zhName && e.name.toLowerCase() !== zhName.toLowerCase() ? `<div class="ex-name-en">${e.name}</div>` : ''}
+            <div class="ex-tags">
+              <span class="ex-tag tag-bodypart">${bodyZH}</span>
+              <span class="ex-tag tag-category">${catZH}</span>
+              <span class="ex-tag tag-equipment">${equipZH}</span>
+              ${isPlan ? '<span class="ex-tag tag-plan">📋 计划</span>' : ''}
+            </div>
           </div>
         </div>
       </div>
@@ -458,14 +477,28 @@ function showDetail(id) {
   const e = exercises.find(x => x.id === id);
   if (!e) return;
 
-  const zhName = ENGLISH_TO_ZH[e.name.toLowerCase()];
+  const zhName = e.name_zh || ENGLISH_TO_ZH[e.name.toLowerCase()];
   const name = zhName || e.name;
   const instructions = e.instructions.zh || e.instructions.en || '暂无说明';
   const steps = e.instruction_steps?.zh || e.instruction_steps?.en || null;
+  const isPlan = !!ENGLISH_TO_ZH[e.name.toLowerCase()];
+  const gifUrl = e.media_id ? `https://static.exercisedb.dev/media/${e.media_id}.gif` : '';
 
   document.getElementById('detail-title').textContent = name;
 
-  let bodyHTML = `
+  let bodyHTML = '';
+
+  // GIF image
+  if (gifUrl) {
+    bodyHTML += `<img class="detail-media" src="${gifUrl}" alt="${name}" loading="lazy">`;
+  }
+
+  // English name subtitle
+  if (zhName && e.name.toLowerCase() !== zhName.toLowerCase()) {
+    bodyHTML += `<div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:12px"><em>${e.name}</em></div>`;
+  }
+
+  bodyHTML += `
     <div class="detail-info">
       <div class="detail-info-item">
         <span class="detail-info-label">部位</span>
@@ -491,9 +524,9 @@ function showDetail(id) {
     </ol>`;
   }
 
-  if (zhName) {
+  if (isPlan) {
     bodyHTML += `<a class="detail-plan-link" href="index.html">📋 此动作在增重计划中</a>`;
-  } else if (name !== e.name) {
+  } else {
     bodyHTML += `<div class="detail-not-in-plan">未在当前计划中</div>`;
   }
 

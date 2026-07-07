@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "健身 App 数据流",
+    "subtitle": "PLAN 数据、1324 动作库、中英文映射、示范图的产生与消费",
+    "output": "fitness-dataflow.html",
+    "viewBox": [1080, 800]
+  },
+  "stages": [
+    { "label": "数据源" },
+    { "label": "处理" },
+    { "label": "映射" },
+    { "label": "展示" },
+    { "label": "消费" }
+  ],
+  "nodes": [
+    { "id": "plan_source", "type": "database", "label": "PLAN 数据", "sublabel": "硬编码 7 天计划", "stage": 0, "row": 0, "tag": "6餐×24动作" },
+    { "id": "dataset_source", "type": "database", "label": "exercises JSON", "sublabel": "1324 个健身动作", "stage": 0, "row": 2, "tag": "9.7MB", "width": 130 },
+    { "id": "images_source", "type": "cloud", "label": "exercises/ 图片", "sublabel": "20 张示范图", "stage": 0, "row": 4, "tag": "JPG" },
+    { "id": "render", "type": "backend", "label": "render() 函数", "sublabel": "拼接 HTML", "stage": 1, "row": 0, "tag": "DOM 更新" },
+    { "id": "load_dataset", "type": "backend", "label": "fetch + 解析", "sublabel": "加载 JSON", "stage": 1, "row": 2, "tag": "异步" },
+    { "id": "map_js", "type": "backend", "label": "exercise-map.js", "sublabel": "中英文名映射", "stage": 2, "row": 1, "tag": "22 个映射" },
+    { "id": "ex_images_map", "type": "backend", "label": "EX_IMAGES 映射", "sublabel": "中文名→文件名", "stage": 2, "row": 3, "tag": "24 个映射" },
+    { "id": "plan_ui", "type": "frontend", "label": "计划页面 UI", "sublabel": "训练 + 饮食 + 补剂", "stage": 3, "row": 0, "tag": "结构化展示" },
+    { "id": "library_ui", "type": "frontend", "label": "动作库 UI", "sublabel": "筛选 + 搜索 + 详情", "stage": 3, "row": 2, "tag": "全部 1324 条" },
+    { "id": "modal", "type": "frontend", "label": "示范弹窗", "sublabel": "图片 + 动作要领", "stage": 3, "row": 4, "tag": "🎯" },
+    { "id": "user_plan", "type": "external", "label": "用户查看计划", "sublabel": "每日执行", "stage": 4, "row": 0 },
+    { "id": "user_browse", "type": "external", "label": "用户浏览动作", "sublabel": "学习规范", "stage": 4, "row": 2 },
+    { "id": "user_learn", "type": "external", "label": "用户查看示范", "sublabel": "纠正动作", "stage": 4, "row": 4 }
+  ],
+  "flows": [
+    { "from": "plan_source", "to": "render", "label": "dayKey → PLAN[day]", "classification": "训练/饮食数据", "variant": "emphasis", "route": "straight" },
+    { "from": "render", "to": "plan_ui", "label": "innerHTML", "classification": "DOM 渲染", "variant": "emphasis", "route": "straight" },
+    { "from": "plan_ui", "to": "user_plan", "label": "视觉呈现", "classification": "用户消费", "variant": "default", "route": "straight" },
+    { "from": "dataset_source", "to": "load_dataset", "label": "HTTP fetch", "classification": "原始 JSON", "variant": "emphasis", "route": "straight" },
+    { "from": "load_dataset", "to": "map_js", "label": "中文名匹配", "classification": "名称解析", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "route": "straight" },
+    { "from": "map_js", "to": "library_ui", "label": "标记计划动作", "classification": "交集标识", "variant": "default", "route": "straight" },
+    { "from": "load_dataset", "to": "library_ui", "label": "全部动作数组", "classification": "过滤后展示", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "straight", "labelAt": [540, 360] },
+    { "from": "library_ui", "to": "user_browse", "label": "筛选/搜索", "classification": "用户交互", "variant": "default", "route": "straight" },
+    { "from": "images_source", "to": "ex_images_map", "label": "文件名索引", "classification": "路径映射", "variant": "dashed", "route": "straight" },
+    { "from": "ex_images_map", "to": "modal", "label": "图片 URL", "classification": "img.src", "variant": "default", "route": "straight" },
+    { "from": "modal", "to": "user_learn", "label": "弹窗展示", "classification": "视觉学习", "variant": "default", "route": "straight" },
+    { "from": "render", "to": "ex_images_map", "label": "EX_IMAGES 查找", "classification": "检查是否有图", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "via": [[520, 285], [520, 510]], "labelAt": [540, 390] }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "计划数据路径",
+      "items": [
+        "PLAN 对象硬编码在 index.html 中，零网络开销",
+        "render() 根据 day type 生成不同 UI",
+        "训练日展示 6 动作 + 6 餐 + 补剂，休息日隐藏训练"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "动作库数据路径",
+      "items": [
+        "exercises-dataset.json 9.7MB 首次加载后缓存",
+        "exercise-map.js 将 22 个计划动作名映射到英文数据集",
+        "映射后自动标记 📋 标签，一眼识别计划动作"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "示范图路径",
+      "items": [
+        "EX_IMAGES 映射 24 个中文名→JPG 文件路径",
+        "🎯 按钮根据映射是否存在决定显隐",
+        "图片懒加载：弹窗显示后才触发请求"
+      ]
+    }
+  ]
+}
